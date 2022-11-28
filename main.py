@@ -17,7 +17,7 @@ all_sprites = pygame.sprite.Group()
 
 
 def load_image(name, color_key=None):
-    fullname = os.path.join('data', name)
+    fullname = os.path.join('data\img', name)
     try:
         image = pygame.image.load(fullname).convert()
     except pygame.error as message:
@@ -32,4 +32,4 @@ def load_image(name, color_key=None):
         image = image.convert_alpha()
     return image
 
-
+main()

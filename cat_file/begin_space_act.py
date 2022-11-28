@@ -52,7 +52,7 @@ def message(message):
 
 
 def load_image(name, color_key=None):
-    fullname = os.path.join('data', name)
+    fullname = os.path.join('data\img', name)
     try:
         image = pygame.image.load(fullname).convert_alpha()
     except pygame.error as message:
@@ -152,10 +152,6 @@ class AnimatedSpriteold(pygame.sprite.Sprite):
     def update(self):
         self.cur_frame = (self.cur_frame + 1) % len(self.frames)
         self.image = self.frames[self.cur_frame]
-        self.a += 1
-        if self.a > 1:
-            self.rect = self.rect.move(self.x - self.x, self.y - self.y)
-            self.a = 1
 
 
 class Aster(pygame.sprite.Sprite):
