@@ -3,6 +3,7 @@ import os
 import pygame
 
 from cat_file.begin_space_act import main
+from Act_card import *
 
 pygame.init()
 
@@ -32,4 +33,6 @@ def load_image(name, color_key=None):
         image = image.convert_alpha()
     return image
 
-main()
+#main()
+run_card(1)
+main_card()
