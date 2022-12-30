@@ -1,0 +1,2 @@
+CRITICAL:root:division by zero
+ERROR:root:Переменные main_act (False, False, False, <Player Sprite(in 1 groups)>, 0) (0, 0, [], {'A': <Decorathion Sprite(in 1 groups)>, 'I': <Decorathion Sprite(in 1 groups)>, 'B': <Decorathion Sprite(in 1 groups)>}, False, []) (False, None, 100, 0) Хиты ([], False, False, False, False, False, False)

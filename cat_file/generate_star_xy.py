@@ -1,5 +1,7 @@
 from random import randrange, choice
 # 740 120 1660 940
+
+
 def get_star_coords(widht, height):
     a = 0
     star = []
@@ -11,4 +13,3 @@ def get_star_coords(widht, height):
         star.append(star_temp)
         a += 1
     return star
-

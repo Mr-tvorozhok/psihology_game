@@ -1,7 +1,7 @@
 class Card:
     def __init__(self, lvl):
         self.lvl = lvl
-        a = open(f'data/level/txt/lvl{lvl}.txt', "r", encoding= "utf-8").readlines()
+        a = open(f'data/level/txt/lvl{lvl}.txt', "r", encoding="utf-8").readlines()
         self.card = []
         b = a[0]
         c = 1
@@ -30,4 +30,6 @@ class Card:
     
     def act_list(self):
         return self.act_item
+
+
 print(Card(1).act_list())

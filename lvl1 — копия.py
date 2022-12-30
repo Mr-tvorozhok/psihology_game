@@ -13,7 +13,7 @@ screen = pygame.display.set_mode((widht, height))
 
 
 def load_image(name, color_key=None):
-    fullname = os.path.join('data\img', name)
+    fullname = os.path.join('data\\img', name)
     try:
         image = pygame.image.load(fullname).convert()
     except pygame.error as message:
@@ -50,9 +50,6 @@ class Osmotr_Object(pygame.sprite.Sprite):
             return self.peremen.pp()
         except BaseException:
             pass
-        
-    
-
 
 
 class H1(pygame.sprite.Sprite):
@@ -86,7 +83,7 @@ class H1(pygame.sprite.Sprite):
 
     def pp(self):
         return {"mess": ['Это компьютер', 'Хз на чем он работает', 'Но он превратился в квадрат'],
-                'hp': -10, 'inv': { 'add': ['что то']}}
+                'hp': -10, 'inv': {'add': ['что то']}}
     
     def killing(self):
         for i in self.osm1:

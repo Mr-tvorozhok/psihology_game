@@ -52,7 +52,7 @@ def message(message):
 
 
 def load_image(name, color_key=None):
-    fullname = os.path.join('data\img', name)
+    fullname = os.path.join('data\\img', name)
     try:
         image = pygame.image.load(fullname).convert_alpha()
     except pygame.error as message:

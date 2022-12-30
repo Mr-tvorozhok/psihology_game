@@ -30,6 +30,3 @@ class Card:
 
     def act_list(self):
         return self.act_item
-
-
-print(Card(1).act_list())
