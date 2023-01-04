@@ -44,9 +44,9 @@ class Osmotr_Object(pygame.sprite.Sprite):
         self.item = ''.join(item1)
         self.peremen = peremen
 
-    def pp(self):
+    def osmotr_act(self):
         try:
-            return self.peremen.pp()
+            return self.peremen.osmotr_act()
         except BaseException:
             pass
 
@@ -95,7 +95,7 @@ class H1(pygame.sprite.Sprite):
     def hits_act(self):
         return {"mess": ['Зачем ты врезался сюда?']}
 
-    def pp(self):
+    def osmotr_act(self):
         return {"mess": ['Это компьютер', 'Хз на чем он работает', 'Но он превратился в квадрат',
                          'И да, он отличается от других обьектов']}
 
@@ -126,6 +126,7 @@ class u1(pygame.sprite.Sprite):
         self.floor = False
         self.osm = [1, 1, 1, 1]
         self.osm1 = []
+        self.ob = 56
 
         self.x, self.y = 0, 0
 
@@ -151,18 +152,18 @@ class u1(pygame.sprite.Sprite):
     def hits_act(self):
         return {"mess": ['Зачем ты врезался сюда?']}
 
-    def pp(self):
+    def osmotr_act(self):
         return {"mess": ['Это компьютер', 'Хз на чем он работает', 'Но он превратился в квадрат'],
                 'hp': -10, 'inv': {'add': ['что то']}}
 
-    def despawn(self):
+    def despawn(self, razn):
         for i in self.osm1:
             i.kill()
-        self.rect = self.rect.move(-self.x, -self.y)
+        self.rect = self.rect.move(-self.x - razn, -self.y - razn)
         return self.ob
 
 
-Parametrs2 = {'u': u1(0, 0)}
+Parametrs2 = {'u': u1(-100, -100)}
 
 Walls_prog3 = pygame.sprite.Group()
 Progr3 = pygame.sprite.Group()
@@ -181,6 +182,7 @@ class T3(pygame.sprite.Sprite):
         self.osm = [1, 1, 1, 1]
         self.osm1 = []
         self.x, self.y = 0, 0
+        self.ob = 98
 
     def smena(self, x, y):
         print(1)
@@ -206,22 +208,25 @@ class T3(pygame.sprite.Sprite):
     def hits_act(self):
         return {}
 
-    def pp(self):
+    def osmotr_act(self):
         return {"mess": ['Я умею кусаться', "ахахаахахах", "Вы получили 15 урона"],
                 'hp': -15, }
 
-    def despawn(self):
+    def despawn(self, razn):
         for i in self.osm1:
             i.kill()
-        self.rect = self.rect.move(-self.x, -self.y)
+        self.rect = self.rect.move(-self.x - razn, -self.y - razn)
+        return self.ob
 
 
-Parametrs3 = {"T": T3(0, 0)}
+Parametrs3 = {"T": T3(-100, -100)}
 
 Walls_prog4 = pygame.sprite.Group()
 Progr4 = pygame.sprite.Group()
 Walls_prog5 = pygame.sprite.Group()
 Progr5 = pygame.sprite.Group()
+Walls_prog6 = pygame.sprite.Group()
+Progr6 = pygame.sprite.Group()
 param = {1: Parametrs1, 2: Parametrs2, 3: Parametrs3, 4: [], 5: []}
 param_group = {1: [Walls_prog1, Progr1], 2: [Walls_prog2, Progr2], 3: [Walls_prog3, Progr3], 4: [Walls_prog4, Progr4],
-               5: [Walls_prog5, Progr5]}
+               5: [Walls_prog5, Progr5], 6: [Walls_prog5, Progr5]}

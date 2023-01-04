@@ -83,7 +83,7 @@ def item_act(item):
                       'inv': {'add': ['Неполный баллон с воздухом'], 'rem': ['Баллон c воздухом']}})
         else:
             act_prog({'mess': ['', 'Вы поменяли баллон', "Баллон полностью израсходовался", "Вы его выбросили"],
-                      'inv': {'rem': 'Баллон с воздухом'}})
+                      'inv': {'rem': ['Баллон c воздухом']}})
         clock_ballons = 100
     elif item == 'Походная Аптечка':
         if hp_player + 50 > 100:
@@ -142,6 +142,8 @@ def act_prog(retur):
         hp_player += retur['hp']
     if 'mess' in retur:
         messages(retur['mess'])
+    if 'que' in retur:
+        pass
 
 
 def chests_act1(object1):
@@ -195,13 +197,15 @@ def load_image(name, color_key=None):
     except pygame.error as message:
         print('Cannot load image:', name)
         raise SystemExit(message)
-
+    image.set_colorkey((255, 255, 255))
+    '''
     if color_key is not None:
         if color_key == -1:
             color_key = image.get_at((0, 0))
         image.set_colorkey(color_key)
     else:
         image = image.convert_alpha()
+    '''
     return image
 
 
@@ -213,8 +217,10 @@ class inventar_act:
         self.count_act = 0
 
     def update_param(self, napr):
+        print(inventar)
         if napr == 'ri':
             if chests_act:
+                print('сундук', act_object.item)
                 if not self.act_chests:
                     if len(act_object.item) != 0:
                         self.act_chests = True
@@ -317,7 +323,7 @@ class Osmotr_Object(pygame.sprite.Sprite):
         self.item = ''.join(item1)
         self.peremen = peremen
 
-    def pp(self):
+    def osmotr_act(self):
         try:
             act[self.peremen].act()
         except IndexError:
@@ -380,7 +386,7 @@ class Prohod(pygame.sprite.Sprite):
         self.ob = ob
         # self.param = param
 
-    def pp(self):
+    def osmotr_act(self):
         global prohod_end, prohodlvl, despawn_list
         despawn_list.append(self.ob)
 
@@ -450,7 +456,6 @@ class Decorathion(pygame.sprite.Sprite):
         self.rect = self.rect.move(x, y)
         self.x = x
         self.y = y
-        print(list_osmotr, osmotr)
         self.a = 0
         self.ob = ob
         if list_osmotr[0] == '1':
@@ -483,7 +488,7 @@ class Decorathion(pygame.sprite.Sprite):
         self.image = self.frames[self.cur_frame]
 
     def act(self):
-        print(1)
+        pass
 
 
 class Floor(pygame.sprite.Sprite):
@@ -496,13 +501,21 @@ class Floor(pygame.sprite.Sprite):
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, sheet, columns, rows, x, y):
+    def __init__(self, x, y):
         super().__init__(all_sprites)
         self.frames = []
-        self.cut_sheet(sheet, columns, rows)
+        self.x = x
+        self.y = y
+        sheet = load_image('player_down.png')
+        self.rect = pygame.Rect(0, 0, sheet.get_width() // 4,
+                                sheet.get_height() // 1)
+        self.cut_sheet(load_image('player_down.png'), 4, 1)
+
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
+
         self.rect = self.rect.move(x, y)
+        # self.rect = self.rect.move(x, y)
         self.x = x
         self.y = y
         self.left = False
@@ -513,17 +526,110 @@ class Player(pygame.sprite.Sprite):
         self.button = False
         self.button1 = False
         self.button2 = False
+        self.button3 = 'dow'
+        self.button_old = 'dow'
+        self.animation = 0
+
+    def restart_image(self, param):
+        self.frames = []
+        # WARNING
+        # Спрайты персонажа должны быть одинакового размера
+        if param == 'dow':
+            self.cut_sheet(load_image('player_down.png'), 4, 1)
+        elif param == 'u':
+            self.cut_sheet(load_image('player_up.png'), 4, 1)
+        elif param == 'le':
+            self.cut_sheet(load_image('player_left.png'), 4, 1)
+        elif param == 'ri':
+            self.cut_sheet(load_image('player_right.png'), 4, 1)
+        self.image = self.frames[self.cur_frame]
 
     def cut_sheet(self, sheet, columns, rows):
+        '''
         self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
                                 sheet.get_height() // rows)
+                                '''
         for j in range(rows):
             for i in range(columns):
                 frame_location = (self.rect.w * i, self.rect.h * j)
-                self.frames.append(sheet.subsurface(pygame.Rect(frame_location, self.rect.size)))
+                a = pygame.Rect(frame_location, self.rect.size)
+                self.frames.append(sheet.subsurface(a))
+        # self.rect.move_ip(-self.x, -self.y)
 
     def update(self):
         global hits
+        # Анимация спрайта
+        if not self.button2:
+            if self.ridht:
+                if not (self.up or self.down):
+                    self.button3 = 'ri'
+                    self.button_old = 'dow'
+            if self.left:
+                if not (self.up or self.down):
+                    self.button3 = 'le'
+                    self.button_old = 'dow'
+        else:
+            if self.up:
+                if not (self.left or self.ridht):
+                    self.button3 = 'u'
+                    self.button_old = 'le'
+            if self.down:
+                if not (self.left or self.ridht):
+                    self.button3 = 'dow'
+                    self.button_old = 'le'
+        if self.button3 == 'dow':
+            if self.button_old != 'dow':
+                self.button_old = 'dow'
+                self.restart_image('dow')
+                '''
+            if self.down:
+                self.animation += 1
+            else:
+                self.cur_frame = 0
+                self.image = self.frames[self.cur_frame]'''
+        if self.button3 == 'u':
+            if self.button_old != 'u':
+                self.button_old = 'u'
+                self.restart_image('u')
+                '''
+            if self.up:
+                self.animation += 1
+            else:
+                self.cur_frame = 0
+                self.image = self.frames[self.cur_frame]'''
+        if self.button3 == 'le':
+            if self.button_old != 'le':
+                self.button_old = 'le'
+                self.restart_image('le')
+                '''
+                if self.left:
+                self.animation += 1
+            
+            else:
+                self.cur_frame = 0
+                self.image = self.frames[self.cur_frame]'''
+        if self.button3 == 'ri':
+            if self.button_old != 'ri':
+                self.button_old = 'ri'
+                self.restart_image('ri')
+                '''
+            if self.ridht:
+                self.animation += 1
+            else:
+                self.cur_frame = 0
+                self.image = self.frames[self.cur_frame]'''
+        if self.left or self.ridht or self.down or self.up:
+                self.animation += 1
+        else:
+            self.cur_frame = 0
+            self.image = self.frames[self.cur_frame]
+        if self.animation >= 30:
+            self.cur_frame = (self.cur_frame + 1) % len(self.frames)
+            self.image = self.frames[self.cur_frame]
+            self.animation = 0
+
+        # конец обработчика информаций
+
         # Реакция на стену(сделано с божьей помощью)
         if hits:
             self.wall = True
@@ -548,7 +654,7 @@ class Player(pygame.sprite.Sprite):
                 hits = pygame.sprite.spritecollide(play, Walls, False)
 
                 hits = hits + pygame.sprite.spritecollide(play, param_group[lvl][0], False) + \
-                    pygame.sprite.spritecollide(play, Walls_dm, False)
+                       pygame.sprite.spritecollide(play, Walls_dm, False)
                 if hits:
                     if self.button2:
                         if self.button1 == "dow":
@@ -577,12 +683,14 @@ class Player(pygame.sprite.Sprite):
                     self.x -= 1
 
                 self.x += 1
+
                 self.rect = self.rect.move(1, 0)
             if self.up:
                 if hits:
                     self.y -= 1
                     self.rect = self.rect.move(0, 1)
                 self.y += 1
+
                 self.rect = self.rect.move(0, -1)
             if self.left:
                 if hits:
@@ -605,6 +713,7 @@ class Player(pygame.sprite.Sprite):
             self.button = "ri"
             self.ridht = True
             self.button2 = True
+            self.button3 = 'ri'
         if off:
             self.ridht = False
 
@@ -613,6 +722,7 @@ class Player(pygame.sprite.Sprite):
             self.button1 = "u"
             self.up = True
             self.button2 = False
+            self.button3 = 'u'
         if off:
             self.up = False
 
@@ -621,6 +731,7 @@ class Player(pygame.sprite.Sprite):
             self.button = "le"
             self.left = True
             self.button2 = True
+            self.button3 = "le"
         if off:
             self.left = False
 
@@ -628,6 +739,7 @@ class Player(pygame.sprite.Sprite):
         if not self.up and not off and not hits:
             self.down = True
             self.button1 = "dow"
+            self.button3 = "dow"
             self.button2 = False
         if off:
             self.down = False
@@ -672,36 +784,41 @@ def run_card(lvl1):
     lvl = int(lvl1)
     a = Card(lvl)
     act_list = a.act_list()
-
+    image_floor = ''
+    image_wall = ''
     for i in a.pp():
         for g in i:
             if g == "#":
                 Wall(x, y, act_list[g][1])
+                image_wall = act_list[g][1]
             elif g == "@":
                 Floor(act_list['.'][1], x, y)
-                play = Player(load_image("Player.png"), 1, 1, x, y)
+                play = Player(x, y)
 
             elif g == "&":
                 Wall(x, y, '432.png')
             elif g == ".":
+                image_floor = act_list[g][1]
                 Floor(act_list[g][1], x, y)
             if g in act_list:
                 act_spawn = act_list[g]
                 if act_spawn[-1] in despawn_list:
+                    Floor(image_floor, x, y)
                     x += razn
                     continue
                 if act_spawn[1] == "Dec":
                     if act_spawn[0]:
-                        Wall(x, y + 1, "space.png")
+                        Wall(x, y, "space.png")
                     act[g] = Decorathion(act_spawn[4], x, y + 1, act_spawn[2], act_spawn[3], act_spawn[5:9], g,
                                          act_spawn[10], osmotr=act_spawn[9])
                 elif act_spawn[1] == "Item":
-                    act[g] = Item(x, y + 1, act_spawn[2], act_spawn[8], act_spawn[3:7], g, act_spawn[-1])
+                    act[g] = Item(x, y, act_spawn[2], act_spawn[7], act_spawn[3:7], g, act_spawn[-1])
                 elif act_spawn[1] == "Che":
                     if act_spawn[0]:
                         Wall(x, y + 1, "space.png")
-                    act[g] = Chest(x, y + 1, act_spawn[2], act_spawn[8], act_spawn[3:7], g, act_spawn[-1])
+                    act[g] = Chest(x, y, act_spawn[2], act_spawn[7], act_spawn[3:7], g, act_spawn[-1])
                 elif act_spawn[1] == 'Pro':
+                    Floor(image_floor, x, y)
                     act[g] = Prohod(x, y, act_spawn[2], act_spawn[3], act_spawn[-1])
                 elif act_spawn[1] == 'Obl':
                     act[g] = Wall_damage(x, y, act_spawn[2], act_spawn[3], act_spawn[-1])
@@ -709,15 +826,14 @@ def run_card(lvl1):
                 if g in param[lvl]:
                     a = param[lvl]
                     a = a[g]
-                    print(a.ob, despawn_list)
                     if a.ob in despawn_list:
+                        Floor(image_floor, x, y)
                         x += razn
-                        print(223136274)
+
                         continue
                     a.smena(x + razn, y + razn)
                     if param[lvl][g].floor:
-                        print(12345678)
-                        Floor('1233.png', x, y)
+                        Floor(image_floor, x, y)
             x += razn
         x = 0
         y += razn
@@ -765,10 +881,9 @@ def main_card():
                     else:
                         if not menu_act:
                             if hits_osm:
-                                hits_osm[0].pp()
+                                hits_osm[0].osmotr_act()
                             if hits_osm_prog:
-                                print(11234124)
-                                act_prog(hits_osm_prog[0].pp())
+                                act_prog(hits_osm_prog[0].osmotr_act())
                 if event.key == pygame.K_x:
                     if inventar_a.act:
                         inventar_a.count_act = 0
@@ -808,9 +923,10 @@ def main_card():
         if prohod_end:
             for i in param[lvl]:
                 bye = param[lvl][i].despawn(razn)
-                print(bye)
                 if bye:
                     despawn_list.append(bye)
+            for i in Chests:
+                i.despawn()
 
             return 0
         elif chests_act:
@@ -871,7 +987,7 @@ def main_card():
                 hits = [1]
                 hits_Obl[0].pp_heats()
             if hits_proh:
-                hits_proh[0].pp()
+                hits_proh[0].osmotr_act()
             if message_countt >= len(messages1):
                 message_act = False
                 message_countt = 0
@@ -886,7 +1002,7 @@ def main_card():
             # osmotr.draw(screen)
             if not message_act:
                 clock_ballons1 += 1
-                if clock_ballons1 == 100:
+                if clock_ballons1 == 10:
                     clock_ballons -= 1
                     clock_ballons1 = 0
             if hits_prog:
@@ -940,7 +1056,6 @@ if __name__ == '__main__':
             if log:
                 if log_act:
                     if str(err) != 'display Surface quit':
-                        print(err)
                         logging.critical(err)
 
                         logging.error(
